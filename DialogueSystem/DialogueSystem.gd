@@ -4,6 +4,9 @@ class_name DialogueSystem
 @onready var print_char_timer = $CharTimer
 @onready var end_line_timer = $LineTimer
 
+@export var time_between_chars = 0.1
+@export var time_between_lines = 4.0
+
 signal display_line(line: String)
 
 var lines_to_print: Array[String] = []
@@ -13,6 +16,8 @@ enum States {READY, PRINTING, WAITING}
 var state: States = States.READY
 
 func _ready() -> void:
+    print_char_timer.wait_time = time_between_chars
+    end_line_timer.wait_time = time_between_lines
     print_char_timer.timeout.connect(_print_char)
     end_line_timer.timeout.connect(_finish_printing)
 
