@@ -8,12 +8,16 @@ class_name DialogueSystem
 @export var time_between_lines = 4.0
 
 signal display_line(line: String)
+signal state_changed(state: States)
 
 var lines_to_print: Array[String] = []
 var line_being_printed: String = ""
 var char_index = 0
 enum States {READY, PRINTING, WAITING}
-var state: States = States.READY
+var state: States = States.READY:
+    set(value):
+        emit_signal('state_changed', value)
+        state = value
 
 func _ready() -> void:
     print_char_timer.wait_time = time_between_chars
