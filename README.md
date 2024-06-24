@@ -1,2 +1,2 @@
 # GodotScripts
-Collection of scripts for Godot projects
+Collection of reusable scripts and scenes for Godot projects.
