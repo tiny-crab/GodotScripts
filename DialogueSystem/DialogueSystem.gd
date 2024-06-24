@@ -4,7 +4,9 @@ class_name DialogueSystem
 @onready var print_char_timer = $CharTimer
 @onready var end_line_timer = $LineTimer
 
+## Timespan between printing one [b]char[/b] and the next - in seconds
 @export var time_between_chars = 0.1
+## Timespan between printing one [b]line[/b] and the next - in seconds
 @export var time_between_lines = 4.0
 
 signal display_line(line: String)
@@ -13,6 +15,11 @@ signal state_changed(state: States)
 var lines_to_print: Array[String] = []
 var line_being_printed: String = ""
 var char_index = 0
+
+## State of the DialogueSystem
+## [br]READY - awaiting new lines to be pushed into queue with `print_line` or `print_lines`
+## [br]PRINTING - printing a single line
+## [br]WAITING - paused between printing one line and the next
 enum States {READY, PRINTING, WAITING}
 var state: States = States.READY:
     set(value):
