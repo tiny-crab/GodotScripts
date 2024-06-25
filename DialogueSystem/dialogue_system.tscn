@@ -12,3 +12,6 @@ one_shot = true
 [node name="LineTimer" type="Timer" parent="."]
 wait_time = 2.0
 one_shot = true
+
+[node name="HoldTimer" type="Timer" parent="."]
+one_shot = true

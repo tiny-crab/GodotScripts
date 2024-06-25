@@ -3,11 +3,16 @@ class_name DialogueSystem
 
 @onready var print_char_timer = $CharTimer
 @onready var end_line_timer = $LineTimer
+@onready var hold_timer = $HoldTimer
 
 ## Timespan between printing one [b]char[/b] and the next - in seconds
 @export var time_between_chars = 0.1
+## Timespan between printing one [b]char[/b] and the next when sped up - in seconds
+@export var time_between_chars_speed_up = 0.01
 ## Timespan between printing one [b]line[/b] and the next - in seconds
 @export var time_between_lines = 4.0
+## Timespan between `hold()` and `interrupt()` to interpret the button as held
+@export var time_hold = 0.1
 
 signal display_line(line: String)
 signal state_changed(state: States)
@@ -15,6 +20,7 @@ signal state_changed(state: States)
 var lines_to_print: Array[String] = []
 var line_being_printed: String = ""
 var char_index = 0
+var was_held = false
 
 ## State of the DialogueSystem
 ## [br]READY - awaiting new lines to be pushed into queue with `print_line` or `print_lines`
@@ -29,8 +35,10 @@ var state: States = States.READY:
 func _ready() -> void:
     print_char_timer.wait_time = time_between_chars
     end_line_timer.wait_time = time_between_lines
+    hold_timer.wait_time = time_hold
     print_char_timer.timeout.connect(_print_char)
     end_line_timer.timeout.connect(_finish_printing)
+    hold_timer.timeout.connect(_on_hold_timer_timeout)
 
 ## Queues a single line to be printed into the dialogue box.
 func print_line(line: String) -> void:
@@ -41,14 +49,38 @@ func print_lines(lines) -> void:
     for line in lines:
         lines_to_print.push_back(line)
 
+## Should be called by parent node when a "skip" button is pressed.
+## Will immediately reduce the amount of time between chars
+## Will not interrupt the line if interpreted as "player is holding down button"
+func hold() -> void:
+    print("pressed down")
+    speed_up(true)
+    hold_timer.start()
+
+func _on_hold_timer_timeout():
+    print("button is being held")
+    was_held = true
+
 ## Interrupts the dialogue box.
 ## If during a line being printed, prints the rest of the line.
 ## If waiting between one line and the next, starts the next line immediately
 func interrupt() -> void:
-    if state == States.PRINTING:
-        _print_remaining_text()
-    elif state == States.WAITING:
-        _skip_to_next_line()
+    # if the button was held, don't do anything
+    # the player wanted to speed up the text, not skip ahead
+    speed_up(false)
+    if was_held:
+        print("button was held")
+        was_held = false
+    else:
+        print("button was not held")
+        hold_timer.stop()
+        if state == States.PRINTING:
+            _print_remaining_text()
+        elif state == States.WAITING:
+            _skip_to_next_line()
+
+func speed_up(value) -> void:
+    print_char_timer.wait_time = time_between_chars_speed_up if value else time_between_chars
 
 ## Prints the next character of the currently queued line to the dialogue box.
 ## Expects that `line_being_printed` has already been set with the queued line
