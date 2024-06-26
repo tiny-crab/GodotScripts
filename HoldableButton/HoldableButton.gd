@@ -19,7 +19,6 @@ func _ready():
     self.button_down.connect(_on_button_down)
 
 func _on_press_timer_timeout():
-    print("held down")
     held_down = true
 
 func _on_button_down():
