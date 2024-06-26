@@ -1,0 +1,12 @@
+[gd_scene load_steps=2 format=3 uid="uid://ci2ki4n6fy4h1"]
+
+[ext_resource type="Script" path="res://GodotUtils/HoldableButton/HoldableButton.gd" id="1_qxqqw"]
+
+[node name="HoldableButton" type="Button"]
+offset_left = 14.0
+offset_right = 22.0
+offset_bottom = 8.0
+script = ExtResource("1_qxqqw")
+
+[node name="PressTimer" type="Timer" parent="."]
+one_shot = true
